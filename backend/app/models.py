@@ -1,13 +1,17 @@
 import os
 from datetime import datetime
 
-from sqlalchemy import (Boolean, Column, Date, DateTime, ForeignKey, Integer, String, Text,
-                        UniqueConstraint, Index, create_engine)
+from sqlalchemy import (
+    Boolean, Column, Date, DateTime, ForeignKey, Integer, String, Text,
+    UniqueConstraint, Index, create_engine
+)
 from sqlalchemy.orm import declarative_base, sessionmaker
 
+
+# Database configuration
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# SQLite is only used for local development.
+# SQLite for local development
 if not DATABASE_URL:
     if os.getenv("VERCEL") == "1":
         raise RuntimeError(
@@ -16,7 +20,8 @@ if not DATABASE_URL:
 
     DATABASE_URL = "sqlite:///./roster.db"
 
-# Support older PostgreSQL connection URL format.
+
+# Support PostgreSQL connection strings
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace(
         "postgres://",
@@ -24,6 +29,8 @@ if DATABASE_URL.startswith("postgres://"):
         1
     )
 
+
+# Database engine
 _args = (
     {"check_same_thread": False}
     if DATABASE_URL.startswith("sqlite")
@@ -35,7 +42,13 @@ engine = create_engine(
     connect_args=_args,
     pool_pre_ping=True
 )
-SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
+
+SessionLocal = sessionmaker(
+    bind=engine,
+    autoflush=False,
+    expire_on_commit=False
+)
+
 Base = declarative_base()
 
 
