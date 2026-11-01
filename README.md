@@ -62,3 +62,16 @@ backend/app/seed.py       sample company data
 public/                   index.html, styles.css, app.js (no build step)
 tests/test_engine.py      scenario tests
 ```
+
+
+## Design and Approach
+
+The system uses a relational database to manage employees, brands, processes, and pods. Employees are assigned to pods, brands are linked to pods, and each brand has its own processes and working days. This structure helps maintain clear relationships between different records and makes data management easier.
+
+The roster is generated using a rule-based approach that considers employee availability, brand working days, holidays, process requirements, and staffing needs. After generation, the system validates the roster to check whether all required conditions are satisfied and identifies conflicts or missing employee coverage.
+
+The system supports both single-resource and multi-resource brands. In single-resource brands, one employee handles all assigned processes, while in multi-resource brands, multiple employees share the responsibilities. If an employee is unavailable on a required working day, the system identifies the affected assignments, highlights the coverage gap, and suggests available backup employees.
+
+The system also detects issues such as leave conflicts, weekly-off conflicts, insufficient staffing, missing process coverage, and workload limits. These conflicts are displayed with their reasons and severity so that managers can review and resolve them. The system automates roster generation, availability checks, conflict detection, validation, and backup suggestions, while important decisions such as leave approval, backup selection, manual roster changes, and final publishing remain under manager control.
+
+The application can be further improved to support larger teams and more brands by using database indexing, better data handling, and advanced scheduling algorithms such as Google OR-Tools. Other possible improvements include role-based login, activity logs, better testing with larger datasets, and shift-based scheduling. These changes would make the system more efficient, flexible, and suitable for larger teams.
