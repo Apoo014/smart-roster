@@ -6,10 +6,11 @@ from sqlalchemy import (
     UniqueConstraint, Index, create_engine
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.pool import NullPool
 
 
 # Database configuration
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL")
 
 # SQLite for local development
 if not DATABASE_URL:
@@ -21,13 +22,12 @@ if not DATABASE_URL:
     DATABASE_URL = "sqlite:///./roster.db"
 
 
-# Support PostgreSQL connection strings
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace(
-        "postgres://",
-        "postgresql://",
-        1
-    )
+# Hosted Postgres providers (Neon, Supabase, Heroku...) hand out "postgres://" or "postgresql://" URLs.
+# Pin the psycopg2 driver explicitly: newer SQLAlchemy versions default to psycopg v3, which we don't install.
+for _prefix in ("postgres://", "postgresql://"):
+    if DATABASE_URL.startswith(_prefix):
+        DATABASE_URL = "postgresql+psycopg2://" + DATABASE_URL[len(_prefix):]
+        break
 
 
 # Database engine
@@ -37,10 +37,13 @@ _args = (
     else {}
 )
 
+# Serverless functions should not keep their own connection pool: Neon/Supabase poolers handle that.
+_pool = {"poolclass": NullPool} if os.getenv("VERCEL") == "1" else {"pool_pre_ping": True}
+
 engine = create_engine(
     DATABASE_URL,
     connect_args=_args,
-    pool_pre_ping=True
+    **_pool
 )
 
 SessionLocal = sessionmaker(

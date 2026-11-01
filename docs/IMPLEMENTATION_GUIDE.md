@@ -9,7 +9,7 @@
 | Service layer | `backend/app/services.py` | Connects DB to engine; dashboards, reports, CSV |
 | REST API | `backend/app/main.py` | `/api/...`, docs at `/docs` |
 | Sample data | `backend/app/seed.py` | 32 employees, 25 brands (20 single-resource = 80%), 5 multi-resource |
-| Dashboard | `frontend/` | Aqua-blue/blue theme, weekly + monthly roster, no build step |
+| Dashboard | `public/` | Aqua-blue/blue theme, weekly + monthly roster, no build step |
 
 **Verification status (be honest in your interview):** the engine and its 11 scenario tests were run and pass.
 The FastAPI/SQLAlchemy layer and the browser UI were written to the same contracts and syntax-checked,
@@ -109,6 +109,6 @@ Before sharing the link, open the deployed site, visit every page, and generate 
 
 ## 9. Extending
 
-* **Different calendar type:** add a constant in `engine.py`, extend `is_operational()`, add it to `CAL` in `frontend/app.js`.
+* **Different calendar type:** add a constant in `engine.py`, extend `is_operational()`, add it to `CAL` in `public/app.js`.
 * **New conflict type:** add a block to `engine.compute_conflicts()` returning a dict with `type`, `severity`, `description`, `suggestion`; the UI lists it automatically.
 * **OR-Tools:** write `solve(ctx, dates) -> List[Entry]` and call it in `services.generate_roster()` instead of `generate_entries()`; keep `compute_conflicts()` as the independent checker.
