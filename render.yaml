@@ -1,0 +1,12 @@
+# Render.com blueprint - New > Blueprint > point at your GitHub repo
+services:
+  - type: web
+    name: smart-roster
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      # Add DATABASE_URL pointing at a Render PostgreSQL instance to persist data across deploys.
