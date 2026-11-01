@@ -3,3 +3,7 @@ __pycache__/
 .venv/
 roster.db
 .env
+.env.*
+!.env.example
+.vercel
+node_modules/

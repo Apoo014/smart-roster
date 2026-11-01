@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 from datetime import date
 from pathlib import Path
@@ -16,15 +17,20 @@ from .models import (Assignment, Base, Brand, Conflict, Employee, Holiday, Leave
                      RosterEntry, SessionLocal, WeeklyOff, WorkingRule, engine, get_db)
 from .seed import seed
 
-FRONTEND = Path(__file__).resolve().parents[2] / "frontend"
+FRONTEND = Path(__file__).resolve().parents[2] / "public"   # on Vercel this folder is served by the CDN
+ON_VERCEL = os.getenv("VERCEL") == "1"
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.create_all(engine)
-    with SessionLocal() as db:
-        if db.query(Employee).count() == 0:
-            seed(db)
+    # Locally: create tables + load demo data on first start.
+    # On Vercel (serverless) this must NOT run on every cold start: initialise the database once with
+    #   cd backend && python -m app.seed      (see DEPLOY_VERCEL.md)
+    if not ON_VERCEL:
+        Base.metadata.create_all(engine)
+        with SessionLocal() as db:
+            if db.query(Employee).count() == 0:
+                seed(db)
     yield
 
 
@@ -750,9 +756,5 @@ def health():
 
 
 app.include_router(api)
-if FRONTEND.exists():
-    app.mount("/static", StaticFiles(directory=str(FRONTEND)), name="static")
-
-    @app.get("/", include_in_schema=False)
-    def index():
-        return FileResponse(FRONTEND / "index.html")
+if FRONTEND.exists():                       # local dev only; on Vercel the CDN serves /public before this app runs
+    app.mount("/", StaticFiles(directory=str(FRONTEND), html=True), name="frontend")

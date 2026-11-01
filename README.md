@@ -37,6 +37,10 @@ python -m unittest discover -s tests -v
 The scheduling and validation engine (`backend/app/engine.py`) has no framework dependencies, so these tests
 need nothing installed.
 
+## Deploy publicly
+
+Step-by-step Vercel + Neon (PostgreSQL) guide: [`DEPLOY_VERCEL.md`](DEPLOY_VERCEL.md).
+
 ## What to try first
 
 1. **Dashboard** - KPIs, charts, brands needing attention (all from the database).
@@ -55,6 +59,6 @@ backend/app/services.py   loads DB -> engine, saves rosters/conflicts, dashboard
 backend/app/models.py     SQLAlchemy models (14 tables)
 backend/app/main.py       FastAPI routes (/api/...) and static file hosting
 backend/app/seed.py       sample company data
-frontend/                 index.html, styles.css, app.js (no build step)
+public/                   index.html, styles.css, app.js (no build step)
 tests/test_engine.py      scenario tests
 ```
